@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx playwright *)",
+      "Bash(npx allure *)",
+      "Bash(npx ts-node *)"
+    ]
+  }
+}

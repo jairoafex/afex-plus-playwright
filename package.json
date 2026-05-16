@@ -1,0 +1,22 @@
+{
+  "devDependencies": {
+    "@cucumber/cucumber": "^12.8.2",
+    "@faker-js/faker": "^10.4.0",
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0",
+    "allure-cucumberjs": "^3.7.1",
+    "allure-playwright": "^3.7.1",
+    "dotenv": "^17.4.2",
+    "playwright-html-reporter": "^0.1.11",
+    "serve": "^14.2.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  },
+  "scripts": {
+    "report:serve": "npx serve allure-report -p 4040",
+    "test:quick": "npx playwright test --project=chromium --reporter=line",
+    "test:notify": "npx playwright test --project=chromium && npx allure generate allure-results --clean -o allure-report && npx ts-node -r dotenv/config scripts/notify-slack.ts",
+    "test:full": "npx playwright test && npx allure generate allure-results --clean -o allure-report && npx ts-node scripts/notify-slack.ts",
+    "test:sepa-eur": "rm -rf allure-results && npx playwright test tests/ui/specs/sepa-eur-validation.spec.ts --project=chromium --workers=3 && npx allure generate allure-results --clean -o allure-report && npx ts-node -r dotenv/config scripts/notify-slack.ts"
+  }
+}
