@@ -1,6 +1,7 @@
 import type { PeruBeneficiary } from "../types/beneficiary.types";
 
 export const CLIENT_NAME = "Diana Paez";
+export const CLIENT_COMPANY_NAME = "First Pay Finance Ltd";
 
 export const PERU_BENEFICIARIES = {
   bcpCash: {

@@ -25,6 +25,7 @@ export class BeneficiaryPage {
   private readonly inputYapePhone: Locator;
   private readonly inputAccountNumber: Locator;
   private readonly dropdownAccountType: Locator;
+  private readonly dropdownBeneficiaryType: Locator;
   private readonly inputBankName: Locator;
   private readonly inputBankNameText: Locator;
   private readonly inputAddress: Locator;
@@ -42,12 +43,12 @@ export class BeneficiaryPage {
     this.beneficiaryListContainer = page.locator("div .ant-spin-container");
     this.btnNewBeneficiary = page.locator("//button[.//span[normalize-space()='Nuevo Beneficiario']]");
     this.radiobtnSelectBeneficiay = page.locator("(//span[@class='ant-radio'][1])").first();
-    this.inputBeneficiaryName = page.getByRole("textbox", { name: "* Nombre" });
+    this.inputBeneficiaryName = page.getByRole("textbox", { name: "* Nombre", exact: true });
     this.inputBeneficiarySurname = page.getByRole("textbox", {name: "* Apellidos"});
     this.dropdownIdentificationType = page.getByRole("combobox", {name: "* Tipo de identificación"});
     this.inputBenficiaryId = page.getByRole("textbox", {name: "* Número de identificación"});
     this.inputBeneficiaryPhone = page.locator("//input[contains(@id,'form_item_recipientPhone')]");
-    this.inputYapePhone = page.getByLabel("Teléfono asociado a Yape");
+    this.inputYapePhone = page.getByLabel("Teléfono asociado a Yape");  
     this.inputAccountNumber = page.locator("//input[contains(@id,'form_item_receiverAccountNumber')]");
     this.dropdownAccountType = page.locator("//input[@id='form_item_accountType' or @id='form_item_receiverAccountType']");
     this.inputPurpose= page.getByRole('textbox', { name: '* Propósito de la transacción' })
@@ -59,6 +60,7 @@ export class BeneficiaryPage {
     this.dropdownPurposeSelect = page.getByRole("combobox", { name: "* Propósito de la transacción" });
     this.btnContinue = page.locator("(//span[contains(.,'Continuar')])[1]");
     this.summaryTransferContainer = page.locator(".summary-container");
+    this.dropdownBeneficiaryType = page.getByRole("combobox", { name: "* Tipo de beneficiario" });
   }
   async checkBeneficiaryForm(): Promise<void> {
     await expect(this.beneficiaryListContainer).toHaveCount(1);
@@ -151,6 +153,13 @@ export class BeneficiaryPage {
     await this.dropdownPurposeSelect.click();
     await this.dropdownPurposeSelect.fill(purpose);
     await this.antSelect.selectByText(purpose);
+  }
+
+  async typeBeneficiaryType(beneficiary: string): Promise<void> {
+    await this.dropdownBeneficiaryType.waitFor({ state: 'attached', timeout: TEST_TIMEOUTS.ELEMENT_ATTACHED });
+    await this.dropdownBeneficiaryType.click();
+    await this.dropdownBeneficiaryType.fill(beneficiary);
+    await this.antSelect.selectByText(beneficiary);
   }
 
   async clickOnContinue(): Promise<void> {

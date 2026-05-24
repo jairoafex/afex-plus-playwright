@@ -5,7 +5,7 @@ import { TransferCollectionPage } from "../page/transferCollectionPage";
 import { TransferDetailsPage } from "../page/transferDetailsPage";
 import { AfexModalHelper } from "../../../utils/helpers/afexModal.helper";
 import { EU_BENEFICIARIES } from "../../data/terrapay-europe.data";
-import { CLIENT_NAME } from "../../data/peru.data";
+import { CLIENT_NAME, CLIENT_COMPANY_NAME } from "../../data/peru.data";
 import { getRetryAmount } from "../../../utils/helpers/retryAmount.helper";
 
 const TEST_AMOUNT = process.env.TEST_AMOUNT;
@@ -29,10 +29,11 @@ test.describe("Europa — Terrapay Depósito", () => {
     await feelookupPage.expectFeelookupFormVisible();
   });
 
-  for (const [, data] of Object.entries(EU_BENEFICIARIES).filter(
-    ([, d]) => !TEST_COUNTRY || d.countryName === TEST_COUNTRY
-  )) {
-    test.describe(data.countryName, () => {
+  for (const data of Object.values(EU_BENEFICIARIES)
+    .flat()
+    .filter((d) => !TEST_COUNTRY || d.countryName === TEST_COUNTRY)
+  ) {
+    test.describe(`${data.countryName} — ${data.beneficiaryType}`, () => {
 
       test("Crear giro Terrapay cotizando monto a enviar en USD con nuevo beneficiario", async ({}, testInfo) => {
         test.setTimeout(240_000);
@@ -123,4 +124,89 @@ test.describe("Europa — Terrapay Depósito", () => {
       });
     });
   }
+
+  test.describe("Estonia — empresa remitente", () => {
+    const estoniaEmpresa = EU_BENEFICIARIES.Estonia[0];
+    const estoniaPersna = EU_BENEFICIARIES.Estonia[1];
+
+    test("Crear giro Terrapay a Estonia cotizando monto a enviar en USD con nuevo beneficiario empresa", async ({}, testInfo) => {
+      test.setTimeout(240_000);
+      const sendAmount = getRetryAmount(TEST_AMOUNT ?? "150", testInfo.retry);
+
+      await feelookupPage.typeCountry(estoniaEmpresa.countryName);
+      await feelookupPage.selectMethodPayment("Depósito");
+      await feelookupPage.clickOnAmountType("Enviar");
+      await feelookupPage.typeAmountToSend(sendAmount!);
+      await feelookupPage.clickOnSearchQuotations();
+      await feelookupPage.typeClient(CLIENT_COMPANY_NAME);
+      await feelookupPage.clickOnClientFound();
+
+      await feelookupPage.selectAgentQuote("Terrapay", "Depósito");
+      await feelookupPage.clickOnBtnNext();
+
+      await beneficiaryPage.checkBeneficiaryForm();
+      await beneficiaryPage.clickOnRegisterNewBeneficiary();
+      await beneficiaryPage.typeBeneficiaryType(estoniaEmpresa.beneficiaryType);
+      await beneficiaryPage.typeRealBeneficiaryName(estoniaEmpresa.name);
+      await beneficiaryPage.typeRealBeneficiarySurname(estoniaEmpresa.surname);
+      await beneficiaryPage.typeAccountNumber(estoniaEmpresa.iban);
+      await beneficiaryPage.typeBankNameFreeText(estoniaEmpresa.bankName);
+      await beneficiaryPage.typeSourceFunds(estoniaEmpresa.sourceFunds);
+      await beneficiaryPage.typePurposeSelect(estoniaEmpresa.purpose);
+      await beneficiaryPage.clickOnContinue();
+
+      await beneficiaryPage.expectSummaryTransferVisible();
+      await transferCollectionPage.clickOnRecaudarGiro();
+
+      await transferCollectionPage.clickOnCashCollectOption();
+      await transferCollectionPage.clickOnSellTransfer();
+      await transferCollectionPage.clickOnCollectTransfer();
+      await transferCollectionPage.expectCollectingModalVisisble();
+      await transferCollectionPage.expectSummaryModalVisible();
+      await transferCollectionPage.clickOnBtnConfirmInModal();
+      await afexModal.dismissDteErrorIfVisible();
+
+      await transferDetailsPage.expectGiroCode(GIRO_CODE_PATTERN);
+    });
+
+    test("Crear giro Terrapay a Estonia cotizando monto a enviar en USD con nuevo beneficiario persona", async ({}, testInfo) => {
+      test.setTimeout(240_000);
+      const sendAmount = getRetryAmount(TEST_AMOUNT ?? "150", testInfo.retry);
+
+      await feelookupPage.typeCountry(estoniaPersna.countryName);
+      await feelookupPage.selectMethodPayment("Depósito");
+      await feelookupPage.clickOnAmountType("Enviar");
+      await feelookupPage.typeAmountToSend(sendAmount!);
+      await feelookupPage.clickOnSearchQuotations();
+      await feelookupPage.typeClient(CLIENT_COMPANY_NAME);
+      await feelookupPage.clickOnClientFound();
+
+      await feelookupPage.selectAgentQuote("Terrapay", "Depósito");
+      await feelookupPage.clickOnBtnNext();
+
+      await beneficiaryPage.checkBeneficiaryForm();
+      await beneficiaryPage.clickOnRegisterNewBeneficiary();
+      await beneficiaryPage.typeBeneficiaryType(estoniaPersna.beneficiaryType);
+      await beneficiaryPage.typeRealBeneficiaryName(estoniaPersna.name);
+      await beneficiaryPage.typeRealBeneficiarySurname(estoniaPersna.surname);
+      await beneficiaryPage.typeAccountNumber(estoniaPersna.iban);
+      await beneficiaryPage.typeBankNameFreeText(estoniaPersna.bankName);
+      await beneficiaryPage.typeSourceFunds(estoniaPersna.sourceFunds);
+      await beneficiaryPage.typePurposeSelect(estoniaPersna.purpose);
+      await beneficiaryPage.clickOnContinue();
+
+      await beneficiaryPage.expectSummaryTransferVisible();
+      await transferCollectionPage.clickOnRecaudarGiro();
+
+      await transferCollectionPage.clickOnCashCollectOption();
+      await transferCollectionPage.clickOnSellTransfer();
+      await transferCollectionPage.clickOnCollectTransfer();
+      await transferCollectionPage.expectCollectingModalVisisble();
+      await transferCollectionPage.expectSummaryModalVisible();
+      await transferCollectionPage.clickOnBtnConfirmInModal();
+      await afexModal.dismissDteErrorIfVisible();
+
+      await transferDetailsPage.expectGiroCode(GIRO_CODE_PATTERN);
+    });
+  });
 });

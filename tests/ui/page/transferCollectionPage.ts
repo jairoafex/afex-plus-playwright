@@ -6,6 +6,7 @@ export class TransferCollectionPage {
 
     private readonly page:Page;
     private readonly afexModal:AfexModalHelper;
+    private readonly btnRecaudarGiro: Locator;
     private readonly cashCollectOption:Locator;
     private readonly wireTransferCollectOption:Locator;
     private readonly tbkCollectionOption:Locator;
@@ -17,6 +18,7 @@ export class TransferCollectionPage {
     constructor(page:Page){
         this.page=page;
         this.afexModal= new AfexModalHelper(page);
+        this.btnRecaudarGiro = page.getByRole('button', { name: 'Recaudar Giro' });
         this.cashCollectOption= page.locator("//span[contains(text(),'Efectivo')]");
         this.wireTransferCollectOption= page.locator("//span[contains(text(),'Transferencia bancaria')]");
         this.tbkCollectionOption= page.locator("//span[contains(text(),'Transbank')]");
@@ -25,6 +27,10 @@ export class TransferCollectionPage {
         this.btnCollectTransfer= page.locator("//span[contains(text(),'Recaudar')]")
         this.h3transferSuccess=page.getByRole('heading', { name: 'Recaudación exitosa' })
     }
+
+async clickOnRecaudarGiro(): Promise<void> {
+    await this.btnRecaudarGiro.click();
+}
 
 async clickOnCashCollectOption(): Promise<void> {
     await this.afexModal.expectModalMainNotVisible();

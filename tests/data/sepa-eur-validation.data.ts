@@ -4,6 +4,7 @@ export interface SepaEurValidationCountry {
 
 export const SEPA_EUR_VALIDATION_COUNTRIES: SepaEurValidationCountry[] = [
   { countryName: "Dinamarca" },
+  { countryName: "Estonia" },
   { countryName: "Eslovenia" },
   { countryName: "Eslovaquia" },
   { countryName: "Letonia" },

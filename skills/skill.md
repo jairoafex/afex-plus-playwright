@@ -151,6 +151,7 @@ etapas:
 
 datos_de_prueba:
   cliente: "Diana Paez → 'No presencial'"   # CLIENT_NAME en peru.data.ts
+  cliente_empresa: "First Pay Finance Ltd" → 'No presencial' (solo Europa)
 
   paises_destino:
     - { pais: "Perú",      moneda: "PEN", ciudad_default: "Lima" }
