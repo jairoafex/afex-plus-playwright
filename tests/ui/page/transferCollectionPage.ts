@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { AfexModalHelper } from "../../../utils/helpers/afexModal.helper.js";
-import { TEST_TIMEOUTS } from "../../../utils/constants/timeouts.js";
+import { AfexModalHelper } from "../../../utils/helpers/afexModal.helper";
+import { TEST_TIMEOUTS } from "../../../utils/constants/timeouts";
 
 export class TransferCollectionPage {
 

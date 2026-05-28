@@ -1,5 +1,5 @@
 import { Locator, Page, expect } from "@playwright/test";
-import { TEST_TIMEOUTS } from "../../../utils/constants/timeouts.js";
+import { TEST_TIMEOUTS } from "../../../utils/constants/timeouts";
 
 export class TransferDetailsPage {
   private readonly page: Page;

@@ -18,6 +18,20 @@ export interface TerrapayEuBeneficiary {
  * Fuente: skill.md (Alemania, Bélgica) o patrón equivalente (resto).
  */
 export const EU_BENEFICIARIES: Record<string, TerrapayEuBeneficiary[]> = {
+  Espana: [
+    {
+      countryName: "España",
+      beneficiaryType: "Persona",
+      name: "CARLOS",
+      surname: "GARCIA LOPEZ",
+      iban: "ES9121000418450200051332",
+      bankName: "BANCO SANTANDER",
+      phone: "573157441380",
+      relation: "Hermano",
+      sourceFunds: "Salario",
+      purpose: "Regalo",
+    },
+  ],
   Alemania: [
     {
       countryName: "Alemania",
@@ -25,7 +39,7 @@ export const EU_BENEFICIARIES: Record<string, TerrapayEuBeneficiary[]> = {
       name: "Albrecht",
       surname: "Altdorfer",
       iban: "DE58370400440532018602",
-      bankName: "COMMERZBANK AG",
+      bankName: "Commerzbank AG",
       phone: "573157441380",
       relation: "Hermano",
       sourceFunds: "Salario",

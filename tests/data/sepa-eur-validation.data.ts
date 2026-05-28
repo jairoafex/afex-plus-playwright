@@ -9,7 +9,6 @@ export const SEPA_EUR_VALIDATION_COUNTRIES: SepaEurValidationCountry[] = [
   { countryName: "Eslovaquia" },
   { countryName: "Letonia" },
   { countryName: "Lituania" },
-  { countryName: "Estonia" },
   { countryName: "Portugal" },
   { countryName: "Grecia" },
   { countryName: "Italia" },

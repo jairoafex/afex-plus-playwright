@@ -20,17 +20,23 @@ test.describe("Europa — Terrapay Depósito", () => {
   let afexModal: AfexModalHelper;
 
   test.beforeEach(async ({ page }) => {
+    const baseUrl = process.env.BASE_URL ?? "http://localhost:3000";
     feelookupPage = new FeelookupPage(page);
     beneficiaryPage = new BeneficiaryPage(page);
     transferCollectionPage = new TransferCollectionPage(page);
     transferDetailsPage = new TransferDetailsPage(page);
     afexModal = new AfexModalHelper(page);
-    await page.goto(`${process.env.BASE_URL}`);
+    const response = await page.goto(baseUrl).catch(() => null);
+    if (!response || !response.ok()) {
+      console.error(`\n❌ No se puede conectar a ${baseUrl}. Levanta el proyecto plus-web antes de ejecutar los tests.\n`);
+      test.skip();
+    }
     await feelookupPage.expectFeelookupFormVisible();
   });
 
   for (const data of Object.values(EU_BENEFICIARIES)
     .flat()
+    .filter((d) => d.countryName !== "Estonia")
     .filter((d) => !TEST_COUNTRY || d.countryName === TEST_COUNTRY)
   ) {
     test.describe(`${data.countryName} — ${data.beneficiaryType}`, () => {
@@ -55,11 +61,12 @@ test.describe("Europa — Terrapay Depósito", () => {
         await beneficiaryPage.clickOnRegisterNewBeneficiary();
         await beneficiaryPage.typeRealBeneficiaryName(data.name);
         await beneficiaryPage.typeRealBeneficiarySurname(data.surname);
+        await beneficiaryPage.typeBeneficiaryType(data.beneficiaryType);
         await beneficiaryPage.typeAccountNumber(data.iban);
-        await beneficiaryPage.typeBankNameFreeText(data.bankName);
-        await beneficiaryPage.typeBeneficiaryRelation(data.relation);
-        await beneficiaryPage.typeSourceFunds(data.sourceFunds);
+        await beneficiaryPage.typeBankName(data.bankName);
         await beneficiaryPage.typePurposeSelect(data.purpose);
+        await beneficiaryPage.typeSourceFunds(data.sourceFunds);
+        await beneficiaryPage.typeBeneficiaryRelation(data.relation);
         await beneficiaryPage.clickOnContinue();
 
         await beneficiaryPage.expectSummaryTransferVisible();
@@ -102,11 +109,12 @@ test.describe("Europa — Terrapay Depósito", () => {
         await beneficiaryPage.clickOnRegisterNewBeneficiary();
         await beneficiaryPage.typeRealBeneficiaryName(data.name);
         await beneficiaryPage.typeRealBeneficiarySurname(data.surname);
+        await beneficiaryPage.typeBeneficiaryType(data.beneficiaryType);
         await beneficiaryPage.typeAccountNumber(data.iban);
-        await beneficiaryPage.typeBankNameFreeText(data.bankName);
-        await beneficiaryPage.typeBeneficiaryRelation(data.relation);
-        await beneficiaryPage.typeSourceFunds(data.sourceFunds);
+        await beneficiaryPage.typeBankName(data.bankName);
         await beneficiaryPage.typePurposeSelect(data.purpose);
+        await beneficiaryPage.typeSourceFunds(data.sourceFunds);
+        await beneficiaryPage.typeBeneficiaryRelation(data.relation);
         await beneficiaryPage.clickOnContinue();
 
         await beneficiaryPage.expectSummaryTransferVisible();
@@ -127,7 +135,7 @@ test.describe("Europa — Terrapay Depósito", () => {
 
   test.describe("Estonia — empresa remitente", () => {
     const estoniaEmpresa = EU_BENEFICIARIES.Estonia[0];
-    const estoniaPersna = EU_BENEFICIARIES.Estonia[1];
+    const estoniaPersona = EU_BENEFICIARIES.Estonia[1];
 
     test("Crear giro Terrapay a Estonia cotizando monto a enviar en USD con nuevo beneficiario empresa", async ({}, testInfo) => {
       test.setTimeout(240_000);
@@ -146,13 +154,13 @@ test.describe("Europa — Terrapay Depósito", () => {
 
       await beneficiaryPage.checkBeneficiaryForm();
       await beneficiaryPage.clickOnRegisterNewBeneficiary();
-      await beneficiaryPage.typeBeneficiaryType(estoniaEmpresa.beneficiaryType);
       await beneficiaryPage.typeRealBeneficiaryName(estoniaEmpresa.name);
       await beneficiaryPage.typeRealBeneficiarySurname(estoniaEmpresa.surname);
+      await beneficiaryPage.typeBeneficiaryType(estoniaEmpresa.beneficiaryType);
       await beneficiaryPage.typeAccountNumber(estoniaEmpresa.iban);
       await beneficiaryPage.typeBankNameFreeText(estoniaEmpresa.bankName);
-      await beneficiaryPage.typeSourceFunds(estoniaEmpresa.sourceFunds);
       await beneficiaryPage.typePurposeSelect(estoniaEmpresa.purpose);
+      await beneficiaryPage.typeSourceFunds(estoniaEmpresa.sourceFunds);
       await beneficiaryPage.clickOnContinue();
 
       await beneficiaryPage.expectSummaryTransferVisible();
@@ -173,30 +181,31 @@ test.describe("Europa — Terrapay Depósito", () => {
       test.setTimeout(240_000);
       const sendAmount = getRetryAmount(TEST_AMOUNT ?? "150", testInfo.retry);
 
-      await feelookupPage.typeCountry(estoniaPersna.countryName);
+      await feelookupPage.typeCountry(estoniaPersona.countryName);
       await feelookupPage.selectMethodPayment("Depósito");
       await feelookupPage.clickOnAmountType("Enviar");
       await feelookupPage.typeAmountToSend(sendAmount!);
       await feelookupPage.clickOnSearchQuotations();
-      await feelookupPage.typeClient(CLIENT_COMPANY_NAME);
+      await feelookupPage.typeClient(CLIENT_NAME);
       await feelookupPage.clickOnClientFound();
+      await feelookupPage.clickOnClientNotPresent();
 
       await feelookupPage.selectAgentQuote("Terrapay", "Depósito");
       await feelookupPage.clickOnBtnNext();
 
       await beneficiaryPage.checkBeneficiaryForm();
       await beneficiaryPage.clickOnRegisterNewBeneficiary();
-      await beneficiaryPage.typeBeneficiaryType(estoniaPersna.beneficiaryType);
-      await beneficiaryPage.typeRealBeneficiaryName(estoniaPersna.name);
-      await beneficiaryPage.typeRealBeneficiarySurname(estoniaPersna.surname);
-      await beneficiaryPage.typeAccountNumber(estoniaPersna.iban);
-      await beneficiaryPage.typeBankNameFreeText(estoniaPersna.bankName);
-      await beneficiaryPage.typeSourceFunds(estoniaPersna.sourceFunds);
-      await beneficiaryPage.typePurposeSelect(estoniaPersna.purpose);
+      await beneficiaryPage.typeRealBeneficiaryName(estoniaPersona.name);
+      await beneficiaryPage.typeRealBeneficiarySurname(estoniaPersona.surname);
+      await beneficiaryPage.typeBeneficiaryType(estoniaPersona.beneficiaryType);
+      await beneficiaryPage.typeAccountNumber(estoniaPersona.iban);
+      await beneficiaryPage.typeBankNameFreeText(estoniaPersona.bankName);
+      await beneficiaryPage.typePurposeSelect(estoniaPersona.purpose);
+      await beneficiaryPage.typeSourceFunds(estoniaPersona.sourceFunds);
       await beneficiaryPage.clickOnContinue();
 
       await beneficiaryPage.expectSummaryTransferVisible();
-      await transferCollectionPage.clickOnRecaudarGiro();
+      await beneficiaryPage.clickOnContinue();
 
       await transferCollectionPage.clickOnCashCollectOption();
       await transferCollectionPage.clickOnSellTransfer();

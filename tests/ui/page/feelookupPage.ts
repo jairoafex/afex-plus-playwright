@@ -6,7 +6,6 @@ import {
   AmountType,
   MethodPayment,
   Currency,
-  CurrencySelect,
 } from "../../types/feelookup.types";
 
 export class FeelookupPage {
@@ -25,8 +24,6 @@ export class FeelookupPage {
   private readonly inputAmountToSend: Locator;
   private readonly inputAmountToReceive: Locator;
   private readonly inputPromocode: Locator;
-  private readonly optionCurrencyClp: Locator;
-  private readonly optionCurrencyUsd: Locator;
   private readonly optionReceiveCurrencyEUR: Locator;
   private readonly inputSearchClient: Locator;
   private readonly textClientFound: Locator;
@@ -52,8 +49,6 @@ export class FeelookupPage {
     this.inputAmountToSend = page.locator("//input[contains(@id,'form_item_amount')]");
     this.inputAmountToReceive = page.locator("//input[contains(@id,'form_item_receiveAmount')]");
     this.inputPromocode = page.getByRole('textbox', { name: 'Promocode' })
-    this.optionCurrencyClp = page.locator("//span[contains(.,'CLP')]");
-    this.optionCurrencyUsd = page.locator("(//span[contains(.,'USD')])[2]");
     this.optionReceiveCurrencyEUR = page.locator("//input[contains(@id,'form_item_receiveAmount')]/ancestor::div[contains(@class,'ant-form-item')]//div[contains(@class,'ant-select-selector')]");
     this.inputSearchClient = page.locator("//input[contains(@placeholder,'Buscar..')]");
     this.textClientFound = page.locator("//span[contains(@class,'client-name')]");
@@ -158,14 +153,6 @@ export class FeelookupPage {
     }
   }
 
-  async selectCurrency(currency: CurrencySelect): Promise<void> {
-    const actions: Record<CurrencySelect, Locator> = {
-      USD: this.optionCurrencyUsd,
-      CLP: this.optionCurrencyClp,
-    };
-
-    await actions[currency].fill(currency);
-  }
 
   async selectReceiveCurrencyEUR(): Promise<void> {
     await this.optionReceiveCurrencyEUR.waitFor({ state: 'visible', timeout: TEST_TIMEOUTS.ELEMENT_ATTACHED });
@@ -178,12 +165,14 @@ export class FeelookupPage {
 
   async typeClient(client: string) {
     await this.inputSearchClient.waitFor({ state: 'attached', timeout: TEST_TIMEOUTS.ELEMENT_ATTACHED });
+    await this.page.evaluate(() => window.scrollTo(0, 0));
     await this.inputSearchClient.click();
     await this.inputSearchClient.fill(client);
     await this.inputSearchClient.press("Enter");
   }
 
   async clickOnClientFound() {
+    await this.textClientFound.waitFor({ state: 'visible', timeout: TEST_TIMEOUTS.NORMAL_OPERATION });
     await this.textClientFound.click();
   }
   async clickOnClientNotPresent() {

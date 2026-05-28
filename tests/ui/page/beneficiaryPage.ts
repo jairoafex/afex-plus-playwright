@@ -1,5 +1,4 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { faker as fakerES } from "@faker-js/faker";
 import { TEST_TIMEOUTS } from "../../../utils/constants/timeouts";
 import {
   AccountType,
@@ -16,7 +15,6 @@ export class BeneficiaryPage {
   private readonly page: Page;
   private readonly beneficiaryListContainer: Locator;
   private readonly btnNewBeneficiary: Locator;
-  private readonly radiobtnSelectBeneficiay: Locator;
   private readonly inputBeneficiaryName: Locator;
   private readonly inputBeneficiarySurname: Locator;
   private readonly dropdownIdentificationType: Locator;
@@ -42,7 +40,6 @@ export class BeneficiaryPage {
     this.afexmodalHelper= new AfexModalHelper(page);
     this.beneficiaryListContainer = page.locator("div .ant-spin-container");
     this.btnNewBeneficiary = page.locator("//button[.//span[normalize-space()='Nuevo Beneficiario']]");
-    this.radiobtnSelectBeneficiay = page.locator("(//span[@class='ant-radio'][1])").first();
     this.inputBeneficiaryName = page.getByRole("textbox", { name: "* Nombre", exact: true });
     this.inputBeneficiarySurname = page.getByRole("textbox", {name: "* Apellidos"});
     this.dropdownIdentificationType = page.getByRole("combobox", {name: "* Tipo de identificación"});
@@ -52,15 +49,15 @@ export class BeneficiaryPage {
     this.inputAccountNumber = page.locator("//input[contains(@id,'form_item_receiverAccountNumber')]");
     this.dropdownAccountType = page.locator("//input[@id='form_item_accountType' or @id='form_item_receiverAccountType']");
     this.inputPurpose= page.getByRole('textbox', { name: '* Propósito de la transacción' })
-    this.inputBankName = page.getByRole("combobox", { name: "* Banco" });
+    this.inputBankName = page.locator("//input[@id='form_item_receiverBankCode']/ancestor::div[contains(@class,'ant-select')][1]");
     this.inputBankNameText = page.getByPlaceholder("Ingrese nombre del banco");
     this.inputAddress = page.getByRole("textbox", { name: "* Dirección del beneficiario" });
-    this.dropdownBeneficiaryRelation = page.getByRole("combobox", { name: "* Relación con Beneficiario" });
-    this.dropdownSourceFunds = page.getByRole("combobox", { name: "* Orígen de fondos" });
-    this.dropdownPurposeSelect = page.getByRole("combobox", { name: "* Propósito de la transacción" });
+    this.dropdownBeneficiaryRelation = page.locator("//input[@id='form_item_beneficiaryRelationship']/ancestor::div[contains(@class,'ant-select')][1]");
+    this.dropdownSourceFunds = page.locator("//input[@id='form_item_fundsSource']/ancestor::div[contains(@class,'ant-select')][1]");
+    this.dropdownPurposeSelect = page.locator("//input[@id='form_item_purpose']/ancestor::div[contains(@class,'ant-select')][1]");
     this.btnContinue = page.locator("(//span[contains(.,'Continuar')])[1]");
     this.summaryTransferContainer = page.locator(".summary-container");
-    this.dropdownBeneficiaryType = page.getByRole("combobox", { name: "* Tipo de beneficiario" });
+    this.dropdownBeneficiaryType = page.locator("//input[@id='form_item_receiverType']/ancestor::div[contains(@class,'ant-select')][1]");
   }
   async checkBeneficiaryForm(): Promise<void> {
     await expect(this.beneficiaryListContainer).toHaveCount(1);
@@ -71,16 +68,8 @@ export class BeneficiaryPage {
     await this.btnNewBeneficiary.click();
   }
 
-  async typeBeneficiaryName(): Promise<void> {
-    await this.inputBeneficiaryName.fill(fakerES.person.firstName());
-  }
-
   async typeRealBeneficiaryName(name:string): Promise<void> {
     await this.inputBeneficiaryName.fill(name);
-  }
-
-  async typeBeneficiarySurname(): Promise<void> {
-    await this.inputBeneficiarySurname.fill(fakerES.person.lastName());
   }
 
   async typeRealBeneficiarySurname(surname:string): Promise<void> {
@@ -126,21 +115,20 @@ export class BeneficiaryPage {
   async typeBankName(bank: string): Promise<void> {
     await this.inputBankName.waitFor({ state: 'attached', timeout: TEST_TIMEOUTS.ELEMENT_ATTACHED });
     await this.inputBankName.click();
-    await this.inputBankName.fill(bank);
-    await this.antSelect.selectByText(bank);
+    await this.page.locator("input#form_item_receiverBankCode").fill(bank);
+    await this.antSelect.selectByPartialText(bank);
+    await this.page.locator('.ant-select-dropdown:visible').waitFor({ state: 'hidden', timeout: TEST_TIMEOUTS.NORMAL_OPERATION });
   }
 
   async typeBeneficiaryRelation(relation: string): Promise<void> {
     await this.dropdownBeneficiaryRelation.waitFor({ state: 'attached', timeout: TEST_TIMEOUTS.ELEMENT_ATTACHED });
     await this.dropdownBeneficiaryRelation.click();
-    await this.dropdownBeneficiaryRelation.fill(relation);
     await this.antSelect.selectByText(relation);
   }
 
   async typeSourceFunds(source: string): Promise<void> {
     await this.dropdownSourceFunds.waitFor({ state: 'attached', timeout: TEST_TIMEOUTS.ELEMENT_ATTACHED });
     await this.dropdownSourceFunds.click();
-    await this.dropdownSourceFunds.fill(source);
     await this.antSelect.selectByText(source);
   }
 
@@ -151,15 +139,14 @@ export class BeneficiaryPage {
   async typePurposeSelect(purpose: string): Promise<void> {
     await this.dropdownPurposeSelect.waitFor({ state: 'attached', timeout: TEST_TIMEOUTS.ELEMENT_ATTACHED });
     await this.dropdownPurposeSelect.click();
-    await this.dropdownPurposeSelect.fill(purpose);
     await this.antSelect.selectByText(purpose);
   }
 
   async typeBeneficiaryType(beneficiary: string): Promise<void> {
     await this.dropdownBeneficiaryType.waitFor({ state: 'attached', timeout: TEST_TIMEOUTS.ELEMENT_ATTACHED });
     await this.dropdownBeneficiaryType.click();
-    await this.dropdownBeneficiaryType.fill(beneficiary);
     await this.antSelect.selectByText(beneficiary);
+    await this.page.locator('.ant-select-dropdown:visible').waitFor({ state: 'hidden', timeout: TEST_TIMEOUTS.NORMAL_OPERATION });
   }
 
   async clickOnContinue(): Promise<void> {
